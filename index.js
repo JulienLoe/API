@@ -1,9 +1,11 @@
 const express = require('express');
+require('dotenv').config();
 const app = express();
 const mongoose = require('mongoose');
 const cors = require('cors');
 const PORT = 8080;
-const url_db = 'mongodb+srv://JulienLoe:Julien2132!@cluster0.vlw1bje.mongodb.net/?retryWrites=true&w=majority';
+const LOG = process.env.LOGINDB;
+const url_db = `mongodb+srv://JulienLoe:${LOG}@cluster0.vlw1bje.mongodb.net/?retryWrites=true&w=majority`;
 const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
 
