@@ -1,72 +1,55 @@
 const express = require('express');
-require('dotenv').config();
-const app = express();
-const mongoose = require('mongoose');
-const cors = require('cors');
 const PORT = 8080;
-const LOG = process.env.LOGINDB;
-const url_db = `mongodb+srv://JulienLoe:${LOG}@cluster0.vlw1bje.mongodb.net/?retryWrites=true&w=majority`;
-const Schema = mongoose.Schema;
-const ObjectId = Schema.ObjectId;
+const app = express();
+require('dotenv').config();
+const configDB = require('./configDB/configDB.js')
+const Product = require('./models/products')
+const cors = require('cors');
+const { importDataProducts } = require('./importData.js');
+const {user} = require('./importUser')
+const {userRegister} = require('./register');
+const { order } = require('./order.js');
 
-const planetSchema = new Schema({
-    type: {type: String,
-    required: true},
-    name: {type: String,
-    required: true},
-    diameter: {type: Number,
-    required: true},
-    mass: {type: Number,
-    required: true},
-    description: {type: String,
-    required: true}
-}, {timestamps: true});
-const Planet = mongoose.model('Planet', planetSchema)
+app.use(express.json());
 
-app.use(cors({
-    origin: 'http://localhost:3000'
-}))
+app.use(cors({origin:'http://localhost:3000'}))
 
+console.log(Product.Product)
 
-mongoose.connect(url_db)
-.then(() =>{
-    app.listen(PORT, () => {console.log(`Application démarrée au port ${PORT}`)})
-    console.log("Connecté à la DB")})
-.catch((err) =>{console.log(err)})
+configDB.connectDB();
 
-app.use(express.json())
-
-app.post('/API', (req,res) =>{
-const planet = new Planet(req.body)
-planet.save()
-.then(result =>{
-    console.log('Envoyé sur la DB !')})
-.catch((err) =>{console.log(err)})  
+app.get('/paypal', (req,res)=>{
+    res.send(process.env.PAYPAL)
 })
 
+app.use('/import', importDataProducts)
 
- app.get('/planets', (req,res) =>{
-     Planet.find()
-     .then((result) => {
-        res.send(result);
-     })
-     .then(() =>{
-         console.log("Données envoyées")
-     })
-     .catch((err)=>{console.log(err)})
- })
+app.use('/import', user)
 
- app.delete('/planets/:id', (req,res) =>{
- Planet.deleteOne({_id: req.params.id}).exec()
- res.send()
-  .catch((err) => console.log(err))
-//  id = req.params.id
-//  console.log(id)
+app.use('/user', userRegister)
+
+app.use('/order', order)
+
+app.get('/products', (req, res) =>{
+    Product.Product.find()
+    .then((result)=>res.json(result))
 })
 
-// app.get('/API', (req,res) =>{
-//     Planet.find()
-//     .then((result) =>{
-//         res.send(result)
-//     })
-// })
+app.get('/products/:id', (req, res) =>{
+    console.log(req.params)
+    console.log(req.params.id)
+    Product.Product.findById(req.params.id)
+    .then((result)=>res.json(result))
+})
+
+app.post('/', (req, res) =>{
+    const newProduct = new Product.Product(req.body)
+    newProduct.save(() => console.log('Add new product !'));
+    res.send();
+})
+
+app.get('/',(req, res) =>{
+      res.send("API")
+})
+
+app.listen(PORT, console.log(`Serveur démarré au port ${PORT} !`));
