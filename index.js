@@ -1,7 +1,7 @@
 const express = require('express');
 const PORT = 8080;
 const app = express();
-require('dotenv').config();
+// require('dotenv').config();
 const configDB = require('./configDB/configDB.js')
 const Product = require('./models/products')
 const cors = require('cors');
