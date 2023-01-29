@@ -18,10 +18,6 @@ console.log(Product.Product)
 
 configDB.connectDB();
 
-// app.get('/paypal', (req,res)=>{
-//     res.send(process.env.PAYPAL)
-// })
-
 app.use('/import', importDataProducts)
 
 app.use('/import', user)
