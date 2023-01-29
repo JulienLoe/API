@@ -12,7 +12,7 @@ const { order } = require('./order.js');
 
 app.use(express.json());
 
-app.use(cors({origin:'http://localhost:3000'}))
+app.use(cors({origin:'https://ecommerce-api-8msr.onrender.com'}))
 
 console.log(Product.Product)
 
